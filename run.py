@@ -1,4 +1,4 @@
-"""
++"""
 Run script for calculating w-scores in Schaefer 200x17 atlas labels for a single patient.
 
 Inputs
