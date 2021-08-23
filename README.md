@@ -8,4 +8,6 @@ _w-score =-(raw ct val - intercept - age\*agecoefficient - sex\*sexcoefficient) 
 
 The result is a score for each region describing the difference in that region’s observed cortical thickness compared to that of a healthy control. The gear renders these scores in a 3D model.
 
-![model example](./rendering/data/examples/file200x17jet.png)
+<div align="center">
+<img src="./rendering/data/examples/file200x17jet.png" width="500" />
+ </div>
