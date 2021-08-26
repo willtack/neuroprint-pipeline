@@ -1,4 +1,4 @@
-+"""
+"""
 Run script for calculating w-scores in Schaefer 200x17 atlas labels for a single patient.
 
 Inputs
@@ -8,10 +8,10 @@ Inputs
         ct_image_file (str): path to cortical thickness file in subject space
         t1_image_file (str): path to T1 image
         patient_age (float): age of patient in years
+        patient_sex (int): sex of patient (0 for M, 1 for F)
         thresholds (str): space-separated 'list' of lower limit(s) to display w-scores in render
         prefix (str): string to use as file prefix
         output_dir (str): path to output directory
-        TODO: patient_sex (str): sex of patient ('M' or 'F')
 
 
 Contains the following functions:
@@ -55,6 +55,11 @@ def get_parser():
     parser.add_argument(
         "--patient_age",
         type=float,
+        required=True
+    )
+    parser.add_argument(
+        "--patient_sex",
+        type=int,
         required=True
     )
     parser.add_argument(
@@ -153,8 +158,9 @@ def main():
     # w-score calculation | outputs a pd DataSeries
     logger.info("Calculating w-scores for each region of atlas...")
     pt_age = args.patient_age
-    ws_coffs = pd.read_csv('/opt/labelset/ws_coeffs_03-09-2021.csv')  # w-score coefficients for norm data
-    wscores = -(pt_data.value - ws_coffs.intercept - pt_age*ws_coffs.age_coefficient)/ws_coffs.residual_se
+    pt_sex = args.patient_sex
+    ws_coffs = pd.read_csv('/opt/labelset/ws_coeffs_07-19-2021.csv')  # w-score coefficients for norm data
+    wscores = -(pt_data.value - ws_coffs.intercept - pt_age*ws_coffs.age_coefficient - pt_sex*ws_coffs.sex_coefficient)/ws_coffs.residual_se
 
     # save to DataFrame
     logger.info("Saving w-score results to Dataframe and csv...")
@@ -181,11 +187,11 @@ def main():
 
     thresholds = args.thresholds.split(' ')
     for i in thresholds:
-        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red-yellow' -l {} -k 0".format(wscores_txt_path, schaefer_scale, i)
+        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'JET256' -l {} -k 0".format(wscores_txt_path, schaefer_scale, i)
         logger.info(render_cmd)
         os.system(render_cmd)
     # add the full spectrum
-    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red-yellow' -k 0".format(wscores_txt_path, schaefer_scale)
+    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'JET256' -k 0".format(wscores_txt_path, schaefer_scale)
     logger.info(render_cmd)
     os.system(render_cmd)
     logger.info("Done rendering.")
