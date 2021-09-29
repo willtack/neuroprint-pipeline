@@ -115,7 +115,7 @@ def get_vals(label_index_file, label_image_file, ct_image_file):
             desc = pd.DataFrame(x).describe()
             desc_list = desc[0].to_list()[1:]  # omit 'count' field
             labs_df.loc[i, summvar] = desc_list
-            labs_df["volume"][i] = voxvol * len(w)
+            labs_df["volume"][i] = voxvol * len(w)  # volume for label is voxel volume times number of voxels
         else:
             # pad with 0s
             labs_df.loca[i, summvar] = [0] * len(summvar)
