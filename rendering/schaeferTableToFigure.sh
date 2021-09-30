@@ -266,7 +266,7 @@ elif [[ $invert == "1" ]] ; then
     ${rendir}/surf_schaefer.R ${fstem}.txt $lausannescale ${fstem}
     ${otherrendir}/surf_min_max.R ${fstem}.txt ${fstem}
 else
-  echo " not binaizing or inverting"
+  echo " not binarizing or inverting"
    # make func files
     freplace=${fstem}.func.gii
     if [[ -f lh.${freplace} || -f rh.${freplace} ]] ; then
@@ -396,7 +396,7 @@ echo $(printf %.$2f $(echo "scale=$2;(((10^$2)*$1)+0.5)/(10^$2)" | bc))
 fmin=$(round $min 2)
 
 # finally
-${wbdir}/wb_command -show-scene ${fstem}.scene $scene ${fstem}_${fmin}.png $width $height
+${wbdir}/wb_command -show-scene ${fstem}.scene $scene ${fpath}/${fstem}_${fmin}.png $width $height
 
 echo
 echo "$fileinput with $lausannescale scaled from $min $max "
