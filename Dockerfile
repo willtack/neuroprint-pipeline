@@ -62,9 +62,12 @@ RUN chmod +x /opt/scripts/*
 RUN mkdir -p /opt/labelset
 COPY labelset /opt/labelset
 
+RUN mkdir /input
+RUN mkdir /output
+
 RUN mkdir -p /opt/rendering
 COPY rendering /opt/rendering
 RUN chmod =x /opt/rendering/*
 
 # Set the entrypoint
-ENTRYPOINT ["python /opt/scripts/run.py"]
+ENTRYPOINT ["/usr/local/bin/python", "/opt/scripts/run.py"]
