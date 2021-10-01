@@ -16,4 +16,4 @@ docker run  -v /home/will/Gears/neuroprint-pipeline/docker/input:/input \
 # docker run  --rm -ti --entrypoint=/bin/bash \
 #              -v /home/will/Gears/neuroprint-pipeline/docker/input:/input \
 #              -v /home/will/Gears/neuroprint-pipeline/docker/output:/output \
-#              willtack/neuroprint-pipeline:0.5.0 
+#              willtack/neuroprint-pipeline:0.5.0
