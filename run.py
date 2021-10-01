@@ -39,7 +39,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--label_index_file",
-        required=True
+        required=False
     )
     parser.add_argument(
         "--label_image_file",
@@ -139,17 +139,20 @@ def main():
     # Parse command line arguments
     arg_parser = get_parser()
     args = arg_parser.parse_args()
-    # output_dir = '/home/will/Projects/healthy-t1-dataset/test_sub/118785/output'
     output_dir = args.output_dir
     logger.info("Set output directory to {}".format(output_dir))
+
+    # define label index file
+    label_index_file = '/opt/labelset/Schaefer2018_200Parcels_17Networks_order.csv'
+    logger.info("Set label index file as {}".format(label_index_file))
     # Calculate ct metrics for patient and save to csv
     logger.info("Calculating cortical thickness metrics...")
-    pt_data = get_vals(args.label_index_file, args.label_image_file, args.ct_image_file)
+    pt_data = get_vals(label_index_file, args.label_image_file, args.ct_image_file)
     pt_data = pt_data[pt_data.type == "mean"]  # just use the mean
     pt_data.to_csv(os.path.join(output_dir, args.prefix + "_schaefer.csv"), index=False)
     # pt_data = pd.read_csv(metrics_csv)
     # get index label numbers
-    label_idxs = pd.read_csv(args.label_index_file)
+    label_idxs = pd.read_csv(label_index_file)
     indices = list()
     for ind in range(0, len(label_idxs)):
         i = label_idxs.label_number[ind]
