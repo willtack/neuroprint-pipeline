@@ -4,14 +4,13 @@ The pipeline requires three input images, a label image, a cortical thickness, a
 Move these images to an `input` folder, e.g. `/home/user/myproject/sub-01/input`. Next, make directory for the output files, e.g. `/home/user/myproject/sub-01/output` and mount both directories into the container as in the first two lines of the command. `/input` and `/output` after the colon refer to the directory locations within the container.
 
 #### Parameters
-After the call to the Docker image itself, there are parameters that will be passed to the main python script in the container. Leave `--label_index_file` as is. Use the within-container paths for the image files (i.e. `/input`), which will have the same names as in your local directories.
+After the call to the Docker image itself, there are parameters that will be passed to the main python script in the container. Use the within-container paths for the image files (i.e. `/input`), which will have the same names as in your local directories.
 `--patient_age` is the patient's age at day of scan, an input to the model. `--patient_sex` is obvious. `--thresholds` refers to the w-scores at which the rendered statistical maps will be thresholded (exactly three). `--prefix` is how the output filenames will begin and `--output_dir` is the location in the container where output files should go (match it up with the second line in the command).
 
 ```
 docker run -v /home/user/myproject/sub-01/input:/input \
            -v /home/user/myproject/sub-01/output:/output \
-           willtack/neuroprint-pipeline:0.4.0 \
-           --label_index_file /opt/labelset/Schaefer2018_200Parcels_17Networks_order.csv \
+           willtack/neuroprint-pipeline:0.5.0 \
            --label_image_file /input/sub-120870_ses-120870x20191205x3T_Schaefer2018_200Parcels17Networks.nii.gz \
            --ct_image_file /input/sub-120870_ses-120870x20191205x3T_CorticalThickness.nii.gz \
            --t1_image_file /input/sub-120870_ses-120870x20191205x3T_ExtractedBrain0N4.nii.gz \
@@ -35,8 +34,7 @@ First make a folder for your project in your *home* directory. Then, run a versi
 
 ```
 singularity run --cleanenv -B /project/detre/wtackett/myproject/input:/home/wtackett/myproject/input, \
-                /project/detre/wtackett/myproject/images/neuroprint-pipeline_0.4.0.sif \
-                --label_index_file myproject/input/Schaefer2018_200Parcels_17Networks_order.csv \
+                /project/detre/wtackett/myproject/images/neuroprint-pipeline_0.5.0.sif \
                 --label_image_file myproject/input/sub-120870_ses-120870x20191205x3T_Schaefer2018_200Parcels17Networks.nii.gz \
                 --ct_image_file myproject/input/sub-120870_ses-120870x20191205x3T_CorticalThickness.nii.gz \
                 --t1_image_file myproject/input/sub-120870_ses-120870x20191205x3T_ExtractedBrain0N4.nii.gz \
@@ -49,8 +47,6 @@ Some important notes:
 
 Because of how Singularity operates, we need to mount our data folder, in this case `/project/detre/wtackett/myproject/input` in our home directory,`/home/wtackett/myproject/input`, hence the first line. The container is looking at the home directory, so files are referred to as `myproject/input/sub-120870_ses-120870x20191205x3T_CorticalThickness.nii.gz`, for example, with `myproject/input` being a path relative to /home/wtackett (see below).
 
-A related issue: the index file is baked into the container, which is fine for Docker, but it's easier to pass into Singularity along with the other inputs.
-
 Your home folder, then, starts out looking like this:
 
 ```
@@ -61,7 +57,6 @@ home/wtackett
 └───myproject
    │   
    └───input
-   |    │   Schaefer2018_200Parcels_17Networks_order.csv
    |    │   sub-120870_ses-120870x20191205x3T_Schaefer2018_200Parcels17Networks.nii.gz
    |    │   sub-120870_ses-120870x20191205x3T_CorticalThickness.nii.gz
    |    |   sub-120870_ses-120870x20191205x3T_ExtractedBrain0N4.nii.gz 

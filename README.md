@@ -19,8 +19,7 @@ While this was originally built for Flywheel, it may be used as a standalone Doc
 ```
 docker run  -v /home/will/Gears/neuroprint-pipeline/docker/input:/input \
             -v /home/will/Gears/neuroprint-pipeline/docker/output:/output \
-            willtack/neuroprint-pipeline:0.4.0 \
-            --label_index_file /opt/labelset/Schaefer2018_200Parcels_17Networks_order.csv \
+            willtack/neuroprint-pipeline:0.5.0 \
             --label_image_file /input/sub-120870_ses-120870x20191205x3T_Schaefer2018_200Parcels17Networks.nii.gz \
             --ct_image_file /input/sub-120870_ses-120870x20191205x3T_CorticalThickness.nii.gz \
             --t1_image_file /input/sub-120870_ses-120870x20191205x3T_ExtractedBrain0N4.nii.gz \
