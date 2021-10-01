@@ -67,7 +67,7 @@ RUN mkdir /output
 
 RUN mkdir -p /opt/rendering
 COPY rendering /opt/rendering
-RUN chmod =x /opt/rendering/*
+RUN chmod +x /opt/rendering/*
 
 # Set the entrypoint
 ENTRYPOINT ["/usr/local/bin/python", "/opt/scripts/run.py"]
