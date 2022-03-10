@@ -162,7 +162,7 @@ def main():
     logger.info("Calculating w-scores for each region of atlas...")
     pt_age = args.patient_age
     pt_sex = args.patient_sex
-    ws_coffs = pd.read_csv('/opt/labelset/ws_coeffs_07-19-2021.csv')  # w-score coefficients for norm data
+    ws_coffs = pd.read_csv('/opt/labelset/ws_coeffs_03-10-2022.csv')  # w-score coefficients for norm data
     wscores = -(pt_data.value - ws_coffs.intercept - pt_age*ws_coffs.age_coefficient - pt_sex*ws_coffs.sex_coefficient)/ws_coffs.residual_se
 
     # save to DataFrame
