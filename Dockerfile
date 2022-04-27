@@ -69,5 +69,9 @@ RUN mkdir -p /opt/rendering
 COPY rendering /opt/rendering
 RUN chmod +x /opt/rendering/*
 
+RUN mkdir -p /opt/model
+COPY model /opt/model
+RUN chmod +x /opt/model/*
+
 # Set the entrypoint
 ENTRYPOINT ["/usr/local/bin/python", "/opt/scripts/run.py"]
