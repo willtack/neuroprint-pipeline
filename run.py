@@ -29,6 +29,7 @@ import os
 import glob
 import argparse
 import logging
+from joblib import load
 
 # logging stuff
 logging.basicConfig(level=logging.INFO)
@@ -133,6 +134,33 @@ def get_vals(label_index_file, label_image_file, ct_image_file):
 
     return labs_df_melt
 
+def predict_ct(pt_age, pt_sex,pt_data):
+    # w-score calculation | outputs a pd DataSeries
+    logger.info("Predicting ct for each region of atlas...")
+
+    # The new data to predict on, the age and sex of the patient
+    new_data = np.array([pt_age,pt_sex]).reshape(1, -1)
+
+    indices = []
+    ct_vals = []
+    modeldir = '/opt/model'
+    idx=1
+    for model in sorted(os.listdir(modeldir)):
+        linear_regressor = load(os.path.join(modeldir,model))
+        y_pred = linear_regressor.predict(new_data) # make the prediction
+        ct_vals.append(y_pred[0])
+        indices.append(idx)
+        idx = idx + 1
+
+    # save to DataFrame
+    logger.info("Saving predicted CT values to Dataframe and csv...")
+    d = {'label_number': indices, 'predictedCT': ct_vals}
+    ct_df = pd.DataFrame(data=d)
+
+    # add actual ROI names to wscore spreadsheet
+    ct_df.insert(1, "label_full_name", pt_data['label_full_name'], True)
+
+    return ct_df
 
 def main():
 
@@ -158,43 +186,35 @@ def main():
         i = label_idxs.label_number[ind]
         indices.append(i)
 
-    # w-score calculation | outputs a pd DataSeries
-    logger.info("Calculating w-scores for each region of atlas...")
+    ## GENERATE PREDICTED CORTICAL THICKNESS VALUES
     pt_age = args.patient_age
     pt_sex = args.patient_sex
-    ws_coffs = pd.read_csv('/opt/labelset/ws_coeffs_03-10-2022.csv')  # w-score coefficients for norm data
-    wscores = -(pt_data.value - ws_coffs.intercept - pt_age*ws_coffs.age_coefficient - pt_sex*ws_coffs.sex_coefficient)/ws_coffs.residual_se
+    ct_df = predict_ct(pt_age,pt_sex, pt_data)
+    ct_csv_path = os.path.join(output_dir, args.prefix + "_predictedCT.csv")
+    ct_df.to_csv(ct_csv_path, index=False)
 
-    # save to DataFrame
-    logger.info("Saving w-score results to Dataframe and csv...")
-    d = {'label_number': indices, 'w-score': list(wscores)}
-    wscore_df = pd.DataFrame(data=d)
-    # add actual ROI names to wscore spreadsheet
-    wscore_df.insert(1, "label_full_name", pt_data['label_full_name'], True)
-    wscores_csv_path = os.path.join(output_dir, args.prefix + "_wscores.csv")
-    wscore_df.to_csv(wscores_csv_path, index=False)
 
     # Render an image
-    logger.info("Rendering w-score image...")
+    logger.info("Rendering heatmap...")
     # convert csv to text
-    logger.info("Converting w-scores csv to space-separated txt file.")
-    wscores_txt_path = os.path.splitext(wscores_csv_path)[0] + '.txt'
+    logger.info("Converting predicted cortical thickness csv to space-separated txt file.")
+    ct_txt_path = os.path.splitext(ct_csv_path)[0] + '.txt'
     # remove middle column (region names) and convert commas to spaces
-    convert_cmd = "cut -d, -f2 --complement {} | tr ',' ' ' > {}".format(wscores_csv_path, wscores_txt_path)
+    convert_cmd = "cut -d, -f2 --complement {} | tr ',' ' ' > {}".format(ct_csv_path, ct_txt_path)
     logger.info(convert_cmd)
     os.system(convert_cmd)
-    os.system("sed -i '1 d' {}".format(wscores_txt_path))
+    os.system("sed -i '1 d' {}".format(ct_txt_path))
     # project wscore data onto surface
-    logger.info("Projecting w-scores onto surface...")
+    logger.info("Projecting cortical thickness values onto surface...")
     schaefer_scale = 'schaefer200x17'  # in case this becomes flexible later
 
     thresholds = args.thresholds.split(' ')
     for i in thresholds:
-        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red_yellow' -l {} -k 0".format(wscores_txt_path, schaefer_scale, i)
+        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
         logger.info(render_cmd)
         os.system(render_cmd)
     # add the full spectrum
-    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red_yellow' -k 0".format(wscores_txt_path, schaefer_scale)
+    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
     logger.info(render_cmd)
     os.system(render_cmd)
     logger.info("Done rendering.")
