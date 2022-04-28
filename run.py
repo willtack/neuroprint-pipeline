@@ -134,7 +134,8 @@ def get_vals(label_index_file, label_image_file, ct_image_file):
 
     return labs_df_melt
 
-def predict_ct(pt_age, pt_sex,pt_data):
+
+def predict_ct(pt_age, pt_sex, pt_data):
     # w-score calculation | outputs a pd DataSeries
     logger.info("Predicting ct for each region of atlas...")
 
@@ -157,10 +158,15 @@ def predict_ct(pt_age, pt_sex,pt_data):
     d = {'label_number': indices, 'predictedCT': ct_vals}
     ct_df = pd.DataFrame(data=d)
 
-    # add actual ROI names to wscore spreadsheet
+    # add ROI names and actual CT values to spreadsheet
     ct_df.insert(1, "label_full_name", pt_data['label_full_name'], True)
+    ct_df.insert(2, "actualCT", pt_data['value'], True)
+
+    # calculate difference of predicted vs actual
+    ct_df['diff'] = ct_df['predictedCT'] - ct_df['actualCT']
 
     return ct_df
+
 
 def main():
 
@@ -186,21 +192,20 @@ def main():
         i = label_idxs.label_number[ind]
         indices.append(i)
 
-    ## GENERATE PREDICTED CORTICAL THICKNESS VALUES
+    # GENERATE PREDICTED CORTICAL THICKNESS VALUES
     pt_age = args.patient_age
     pt_sex = args.patient_sex
     ct_df = predict_ct(pt_age,pt_sex, pt_data)
     ct_csv_path = os.path.join(output_dir, args.prefix + "_predictedCT.csv")
     ct_df.to_csv(ct_csv_path, index=False)
 
-
-    # Render an image
+    # Render images
     logger.info("Rendering heatmap...")
     # convert csv to text
     logger.info("Converting predicted cortical thickness csv to space-separated txt file.")
     ct_txt_path = os.path.splitext(ct_csv_path)[0] + '.txt'
     # remove middle column (region names) and convert commas to spaces
-    convert_cmd = "cut -d, -f2 --complement {} | tr ',' ' ' > {}".format(ct_csv_path, ct_txt_path)
+    convert_cmd = "cut -d, -f2-4 --complement {} | tr ',' ' ' > {}".format(ct_csv_path, ct_txt_path)
     logger.info(convert_cmd)
     os.system(convert_cmd)
     os.system("sed -i '1 d' {}".format(ct_txt_path))
@@ -210,11 +215,11 @@ def main():
 
     thresholds = args.thresholds.split(' ')
     for i in thresholds:
-        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
+        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 2 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
         logger.info(render_cmd)
         os.system(render_cmd)
     # add the full spectrum
-    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 4 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
+    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 2 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
     logger.info(render_cmd)
     os.system(render_cmd)
     logger.info("Done rendering.")
