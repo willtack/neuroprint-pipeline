@@ -183,7 +183,7 @@ def main():
     logger.info("Calculating cortical thickness metrics...")
     pt_data = get_vals(label_index_file, args.label_image_file, args.ct_image_file)
     pt_data = pt_data[pt_data.type == "mean"]  # just use the mean
-    pt_data.to_csv(os.path.join(output_dir, args.prefix + "_schaefer.csv"), index=False)
+    #pt_data.to_csv(os.path.join(output_dir, args.prefix + "_schaefer.csv"), index=False)
     # pt_data = pd.read_csv(metrics_csv)
     # get index label numbers
     label_idxs = pd.read_csv(label_index_file)
@@ -215,11 +215,11 @@ def main():
 
     thresholds = args.thresholds.split(' ')
     for i in thresholds:
-        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 2 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
+        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
         logger.info(render_cmd)
         os.system(render_cmd)
     # add the full spectrum
-    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 2 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
+    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
     logger.info(render_cmd)
     os.system(render_cmd)
     logger.info("Done rendering.")
