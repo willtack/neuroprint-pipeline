@@ -215,11 +215,11 @@ def main():
 
     thresholds = args.thresholds.split(' ')
     for i in thresholds:
-        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
+        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 1.75 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
         logger.info(render_cmd)
         os.system(render_cmd)
     # add the full spectrum
-    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
+    render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 1.75 -c 'red_yellow' -k 0".format(ct_txt_path, schaefer_scale)
     logger.info(render_cmd)
     os.system(render_cmd)
     logger.info("Done rendering.")
