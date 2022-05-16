@@ -195,7 +195,7 @@ def main():
     # GENERATE PREDICTED CORTICAL THICKNESS VALUES
     pt_age = args.patient_age
     pt_sex = args.patient_sex
-    ct_df = predict_ct(pt_age,pt_sex, pt_data)
+    ct_df = predict_ct(pt_age, pt_sex, pt_data)
     ct_csv_path = os.path.join(output_dir, args.prefix + "_predictedCT.csv")
     ct_df.to_csv(ct_csv_path, index=False)
 
@@ -215,7 +215,7 @@ def main():
 
     thresholds = args.thresholds.split(' ')
     for i in thresholds:
-        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -h 1.75 -c 'red_yellow' -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
+        render_cmd = "bash -x /opt/rendering/schaeferTableToFigure.sh -f {} -r {} -s 1 -c 'red_yellow' -h 1.75 -l {} -k 0".format(ct_txt_path, schaefer_scale, i)
         logger.info(render_cmd)
         os.system(render_cmd)
     # add the full spectrum
