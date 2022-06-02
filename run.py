@@ -183,7 +183,7 @@ def main():
     logger.info("Calculating cortical thickness metrics...")
     pt_data = get_vals(label_index_file, args.label_image_file, args.ct_image_file)
     pt_data = pt_data[pt_data.type == "mean"]  # just use the mean
-    #pt_data.to_csv(os.path.join(output_dir, args.prefix + "_schaefer.csv"), index=False)
+    pt_data.to_csv(os.path.join(output_dir, args.prefix + "_schaefer.csv"), index=False)
     # pt_data = pd.read_csv(metrics_csv)
     # get index label numbers
     label_idxs = pd.read_csv(label_index_file)
